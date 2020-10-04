@@ -50,13 +50,8 @@ namespace Quantum.Kata.GroversAlgorithm {
     //       If the query register is in state |11...1⟩, flip the target qubit.
     //       If the query register is in state (|00...0⟩ + |11...1⟩) / sqrt(2), and the target is in state |0⟩,
     //       the joint state of the query register and the target qubit should be (|00...00⟩ + |11...11⟩) / sqrt(2).
-    operation Oracle_AllOnes (queryRegister : Qubit[], target : Qubit) : Unit{
+    operation Oracle_AllOnes (queryRegister : Qubit[], target : Qubit) : Unit {
         
-        body (...) {
-            Controlled X(queryRegister, target);
-        }
-        
-        adjoint self;
     }
     
     
@@ -73,22 +68,6 @@ namespace Quantum.Kata.GroversAlgorithm {
     //        If the register is in state |10101⟩, flip the target qubit.
     operation Oracle_AlternatingBits (queryRegister : Qubit[], target : Qubit) : Unit {
         
-        body (...) {
-            // Flip all odd positions
-            FlipOddPositionBits(queryRegister);
-            // this creates |11..1> if it was |1010..> before
-            Controlled X(queryRegister, target);
-            // undo flipping
-            Adjoint FlipOddPositionBits(queryRegister);
-        }
-        
-        adjoint self;
-    }
-    
-    operation FlipOddPositionBits(register : Qubit[]) : Unit is Adj {
-        for (i in 1..2..Length(register)-1) {
-            X(register[i]);
-        }
     }
     
     // Task 1.3. Arbitrary bit pattern oracle
@@ -104,15 +83,10 @@ namespace Quantum.Kata.GroversAlgorithm {
     //        If the bit pattern is [true, false], you need to flip the target qubit if and only if the qubits are in the |10⟩ state.
     operation Oracle_ArbitraryPattern (queryRegister : Qubit[], target : Qubit, pattern : Bool[]) : Unit {
         
-        body (...) {
-            // The following line enforces the constraint on the input arrays.
-            // You don't need to modify it. Feel free to remove it, this won't cause your code to fail.
-            EqualityFactI(Length(queryRegister), Length(pattern), "Arrays should have the same length");
+        // The following line enforces the constraint on the input arrays.
+        // You don't need to modify it. Feel free to remove it, this won't cause your code to fail.
+        EqualityFactI(Length(queryRegister), Length(pattern), "Arrays should have the same length");
 
-            (ControlledOnBitString(pattern,X))(queryRegister, target);
-        }
-        
-        adjoint self;
     }
     
     
@@ -132,22 +106,16 @@ namespace Quantum.Kata.GroversAlgorithm {
     function OracleConverter (markingOracle : ((Qubit[], Qubit) => Unit is Adj)) : (Qubit[] => Unit is Adj) {
         
         // Hint: Remember that you can define auxiliary operations.
-        
-        return OracleConverterImpl(markingOracle, _);
+        fail ("not implemented");
     }
     
     operation OracleConverterImpl(markingOracle : ((Qubit[], Qubit) => Unit is Adj), register:Qubit[]) : Unit is Adj {
         using (target = Qubit()) {
             // Put the target into the |-⟩ state
-            X(target);
-            H(target);
             
             // apply oracle function
-            markingOracle(register, target);
 
             // cleanup target before relase
-            H(target);
-            X(target);
         }
 
     }
@@ -162,9 +130,7 @@ namespace Quantum.Kata.GroversAlgorithm {
     //
     // Note:  If the register started in the |0...0⟩ state, this operation
     //        will prepare an equal superposition of all 2^N basis states.
-    operation HadamardTransform (register : Qubit[]) : Unit
-    is Adj {
-        ApplyToEachA(H, register);
+    operation HadamardTransform (register : Qubit[]) : Unit is Adj {
     }
     
     
@@ -175,27 +141,20 @@ namespace Quantum.Kata.GroversAlgorithm {
     //        If the register is in state |0...0⟩, leave it unchanged.
     //        If the register is in any other basis state, multiply its phase by -1.
     // Note: This operation implements operator 2|0...0⟩⟨0...0| - I.
-    operation ConditionalPhaseFlip (register : Qubit[]) : Unit
-    is Adj {
+    operation ConditionalPhaseFlip (register : Qubit[]) : Unit is Adj {
     
         // Hint 1: Note that quantum states are defined up to a global phase.
         // Thus the state obtained as a result of this operation is the same
         // as the state obtained by flipping the sign of only the |0...0⟩ state.
 
         // Flip |0...0> -> |1...1>
-        ApplyToEachA(X, register);
 
         // Condtional Z flips phase if state is |1...1>, Z(|0>)=|0>, Z(|1>=-|1>)
-        Controlled Z(Most(register), Tail(register));
 
         // Undo flip
-        ApplyToEachA(X, register);
 
         // Hint 2: Alternative: You can use the same trick as in the oracle converter task.
-            
-        // let allZerosOracle = Oracle_ArbitraryPattern(_, _, new Bool[Length(register)]);
-        // let flipOracle = OracleConverter(allZerosOracle);
-        // flipOracle(register);
+        // create a AllZero phase-flip oracle and execute it on the register
     }
     
     
@@ -214,11 +173,6 @@ namespace Quantum.Kata.GroversAlgorithm {
         //    3) perform a conditional phase shift
         //    4) apply the Hadamard transform again
             
-        oracle(register);
-        // apply Grover diffusion operation H, PhaseFlip, H
-        HadamardTransform(register);
-        ConditionalPhaseFlip(register);
-        HadamardTransform(register);
     }
     
     
@@ -238,12 +192,6 @@ namespace Quantum.Kata.GroversAlgorithm {
     // and is easier to configure/calculate outside the search algorithm itself (for example, in the driver).
     operation GroversSearch (register : Qubit[], oracle : ((Qubit[], Qubit) => Unit is Adj), iterations : Int) : Unit {
  
-        let phaseOracle = OracleConverter(oracle);
-        HadamardTransform(register);
-
-        for (i in 1..iterations) {
-            GroverIteration(register, phaseOracle);
-        }
     }
     
     
@@ -262,85 +210,5 @@ namespace Quantum.Kata.GroversAlgorithm {
 
         // Hint 3: You can use the Message function to write the results to the console.
 
-        let invocationNumbers = 100;
-        let n=5; // N=2^n
-        let N=PowI(2,n);
-        let iterations = Ceiling(PI()*Sqrt(IntAsDouble(N))/4.0+0.5);
-        for (k in 1..iterations) {
-            mutable correct = 0;
-            Message("");
-            Message("-------------------------------------------------------------------------------------");
-            Message("n="+IntAsString(n)+" N="+IntAsString(PowI(2, n))+" with grover iterations set to: "+IntAsString(k));
-            Message("-------------------------------------------------------------------------------------");
-            Message("Grover Search for |1111...>");
-            for (i in 0..invocationNumbers-1) {
-                using ((space, result)=(Qubit[n], Qubit())) {
-                    GroversSearch(space, Oracle_AllOnes, k);
-
-                    // measure result space
-                    let measure = MultiM(space);
-                    Oracle_AllOnes(space, result);
-                    if (M(result)==One) {
-    //                    Message("found |1111...>");
-                        set correct += 1;
-                    }
-                    else {
-    //                    Message ("wrong result: ");
-                    }
-    //                DumpRegister((), space);
-
-                    ResetAll(space+ [result]);
-                }
-            }
-            Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
-
-            set correct = 0;
-            Message("Grover Search for |1010...>");
-            for (i in 0..invocationNumbers-1) {
-                using ((space, result)=(Qubit[n], Qubit())) {
-                    GroversSearch(space, Oracle_AlternatingBits, k);
-
-                    // measure result space
-                    let measure = MultiM(space);
-                    Oracle_AlternatingBits(space, result);
-                    if (M(result)==One) {
-    //                    Message("found |1010...>");
-                        set correct += 1;
-                    }
-                    else {
-    //                    Message ("wrong result: ");
-                    }
-    //                DumpRegister((), space);
-
-                    ResetAll(space+ [result]);
-                }
-            }
-            Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
-
-            set correct = 0;
-            let pattern = IntAsBoolArray(Microsoft.Quantum.Random.DrawRandomInt(0, PowI(2,n)-1), n);
-
-            Message("Grover Search for |"+IntAsString(BoolArrayAsInt(pattern))+">");
-            for (i in 0..invocationNumbers-1) {
-                using ((space, result)=(Qubit[n], Qubit())) {
-                    GroversSearch(space, Oracle_ArbitraryPattern( _, _, pattern), k);
-
-                    // measure result space
-                    let measure = MultiM(space);
-                    Oracle_ArbitraryPattern(space, result, pattern);
-                    if (M(result)==One) {
-    //                    Message("found |"+IntAsString(BoolArrayAsInt(pattern))+">");
-                        set correct += 1;
-                    }
-                    else {
-    //                    Message ("wrong result: ");
-                    }
-    //                DumpRegister((), space);
-
-                    ResetAll(space+ [result]);
-                }
-            }
-            Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
-        }
     }
 }

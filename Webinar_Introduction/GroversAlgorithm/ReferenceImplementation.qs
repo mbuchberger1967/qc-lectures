@@ -132,3 +132,103 @@ namespace Quantum.Kata.GroversAlgorithm {
     }
     
 }
+
+
+    // Task 3.2. Using Grover's search
+    // Goal: Use your implementation of Grover's algorithm from task 3.1 and the oracles from part 1
+    //       to find the marked elements of the search space.
+    // This task is not covered by a test and allows you to experiment with running the algorithm.
+//     operation E2E_GroversSearch_Test () : Unit {
+
+//         // Hint 1: To check whether the algorithm found the correct answer (i.e., an answer marked as 1 by the oracle), 
+//         // you can apply the oracle once more to the register after you've measured it and an ancilla qubit,
+//         // which will calculate the function of the answer found by the algorithm.
+
+//         // Hint 2: Experiment with the number of iterations to see how it affects
+//         // the probability of the algorithm finding the correct answer.
+
+//         // Hint 3: You can use the Message function to write the results to the console.
+
+//         let invocationNumbers = 100;
+//         let n=5; // N=2^n
+//         let N=PowI(2,n);
+//         let iterations = Ceiling(PI()*Sqrt(IntAsDouble(N))/4.0+0.5);
+//         for (k in 1..iterations) {
+//             mutable correct = 0;
+//             Message("");
+//             Message("-------------------------------------------------------------------------------------");
+//             Message("n="+IntAsString(n)+" N="+IntAsString(PowI(2, n))+" with grover iterations set to: "+IntAsString(k));
+//             Message("-------------------------------------------------------------------------------------");
+//             Message("Grover Search for |1111...>");
+//             for (i in 0..invocationNumbers-1) {
+//                 using ((space, result)=(Qubit[n], Qubit())) {
+//                     GroversSearch(space, Oracle_AllOnes, k);
+
+//                     // measure result space
+//                     let measure = MultiM(space);
+//                     Oracle_AllOnes(space, result);
+//                     if (M(result)==One) {
+//     //                    Message("found |1111...>");
+//                         set correct += 1;
+//                     }
+//                     else {
+//     //                    Message ("wrong result: ");
+//                     }
+//     //                DumpRegister((), space);
+
+//                     ResetAll(space+ [result]);
+//                 }
+//             }
+//             Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
+
+//             set correct = 0;
+//             Message("Grover Search for |1010...>");
+//             for (i in 0..invocationNumbers-1) {
+//                 using ((space, result)=(Qubit[n], Qubit())) {
+//                     GroversSearch(space, Oracle_AlternatingBits, k);
+
+//                     // measure result space
+//                     let measure = MultiM(space);
+//                     Oracle_AlternatingBits(space, result);
+//                     if (M(result)==One) {
+//     //                    Message("found |1010...>");
+//                         set correct += 1;
+//                     }
+//                     else {
+//     //                    Message ("wrong result: ");
+//                     }
+//     //                DumpRegister((), space);
+
+//                     ResetAll(space+ [result]);
+//                 }
+//             }
+//             Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
+
+//             set correct = 0;
+//             let pattern = IntAsBoolArray(Microsoft.Quantum.Random.DrawRandomInt(0, PowI(2,n)-1), n);
+
+//             Message("Grover Search for |"+IntAsString(BoolArrayAsInt(pattern))+">");
+//             for (i in 0..invocationNumbers-1) {
+//                 using ((space, result)=(Qubit[n], Qubit())) {
+//                     GroversSearch(space, Oracle_ArbitraryPattern( _, _, pattern), k);
+
+//                     // measure result space
+//                     let measure = MultiM(space);
+//                     Oracle_ArbitraryPattern(space, result, pattern);
+//                     if (M(result)==One) {
+//     //                    Message("found |"+IntAsString(BoolArrayAsInt(pattern))+">");
+//                         set correct += 1;
+//                     }
+//                     else {
+//     //                    Message ("wrong result: ");
+//                     }
+//     //                DumpRegister((), space);
+
+//                     ResetAll(space+ [result]);
+//                 }
+//             }
+//             Message(DoubleAsStringWithFormat(IntAsDouble(correct)/IntAsDouble(invocationNumbers), "correct results with {0}% prob"));
+//         }
+//     }
+// }
+
