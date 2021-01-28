@@ -133,6 +133,9 @@ namespace Quantum.Kata.GroversAlgorithm {
     
 }
 
+    // open Microsoft.Quantum.Math;
+    // open Microsoft.Quantum.Convert;
+    // open Microsoft.Quantum.Measurement;
 
     // Task 3.2. Using Grover's search
     // Goal: Use your implementation of Grover's algorithm from task 3.1 and the oracles from part 1
